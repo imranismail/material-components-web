@@ -122,21 +122,21 @@
               </div>
             </div>
             <div class="right-column-controls">
-              Default Menu Surface Position:
+              Default Anchor Element Anchor Corner:
               <div>
-                <label><input type="radio" name="menu-position" value="top start" checked> Top start</label>
+                <label><input type="radio" name="anchor-position" value="top start" checked> Top start</label>
               </div>
 
               <div>
-                <label><input type="radio" name="menu-position" value="top end"> Top end</label>
+                <label><input type="radio" name="anchor-position" value="top end"> Top end</label>
               </div>
 
               <div>
-                <label><input type="radio" name="menu-position" value="bottom start"> Bottom start</label>
+                <label><input type="radio" name="anchor-position" value="bottom start"> Bottom start</label>
               </div>
 
               <div>
-                <label><input type="radio" name="menu-position" value="bottom end"> Bottom end</label>
+                <label><input type="radio" name="anchor-position" value="bottom end"> Bottom end</label>
               </div>
             </div>
             <p>
@@ -166,6 +166,8 @@
         var menuEl = document.querySelector('#demo-menu');
         var menu = mdc.menuSurface.MDCMenuSurface.attachTo(menuEl);
         var menuButtonEl = document.querySelector('#menu-button');
+
+        menu.hoistMenuToBody();
 
         menuButtonEl.addEventListener('click', function() {
           menu.open = !menu.open;
@@ -203,7 +205,7 @@
           });
         }
 
-        radios = document.querySelectorAll('input[name="menu-position"]');
+        radios = document.querySelectorAll('input[name="anchor-position"]');
         for (var i = 0; i < radios.length; i++) {
           radios[i].addEventListener('change', function(evt) {
             if (evt.target.checked) {

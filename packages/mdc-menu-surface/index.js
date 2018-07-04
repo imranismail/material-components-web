@@ -79,6 +79,20 @@ class MDCMenuSurface extends MDCComponent {
   }
 
   /**
+   * Removes the menu-surface from it's current location and appends it to the
+   * body to overcome any overflow issues.
+   */
+  hoistMenuToBody() {
+    document.body.appendChild(this.root_.parentElement.removeChild(this.root_));
+    this.root_.style.position = 'fixed';
+    this.foundation_.hoistedElement();
+  }
+
+  setMenuSurfaceAnchorElement(element) {
+    this.anchorElement_ = element;
+  }
+
+  /**
    * @param {MenuSurfaceCorner} corner Default anchor corner alignment of top-left
    *     surface corner.
    */

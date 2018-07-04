@@ -127,6 +127,8 @@ class MDCMenuSurfaceFoundation extends MDCFoundation {
     this.measures_ = null;
     /** @private {boolean} */
     this.quickOpen_ = false;
+    /** @private {boolean} */
+    this.hoistedElement_ = false;
   }
 
   init() {
@@ -167,6 +169,10 @@ class MDCMenuSurfaceFoundation extends MDCFoundation {
     this.anchorMargin_.right = typeof margin.right === 'number' ? margin.right : 0;
     this.anchorMargin_.bottom = typeof margin.bottom === 'number' ? margin.bottom : 0;
     this.anchorMargin_.left = typeof margin.left === 'number' ? margin.left : 0;
+  }
+
+  hoistedElement() {
+    this.hoistedElement_ = true;
   }
 
   /** @param {boolean} quickOpen */
@@ -338,11 +344,15 @@ class MDCMenuSurfaceFoundation extends MDCFoundation {
     const isBottomAligned = Boolean(corner & MenuSurfaceCornerBit.BOTTOM);
 
     // When maximum height is not specified, it is handled from css.
-    if (this.anchorCorner_ & MenuSurfaceCornerBit.BOTTOM) {
-      if (isBottomAligned) {
-        maxHeight = viewportDistance.top + this.anchorMargin_.top;
-      } else {
-        maxHeight = viewportDistance.bottom - this.anchorMargin_.bottom;
+    if (isBottomAligned) {
+      maxHeight = viewportDistance.top + this.anchorMargin_.top -32;
+      if (this.anchorCorner_ & MenuSurfaceCornerBit.BOTTOM) {
+        maxHeight -= this.measures_.anchorHeight;
+      }
+    } else {
+      maxHeight = viewportDistance.bottom - this.anchorMargin_.bottom + this.measures_.anchorHeight - 32;
+      if (this.anchorCorner_ & MenuSurfaceCornerBit.BOTTOM) {
+        maxHeight -= this.measures_.anchorHeight;
       }
     }
 
@@ -365,8 +375,8 @@ class MDCMenuSurfaceFoundation extends MDCFoundation {
     const horizontalOffset = this.getHorizontalOriginOffset_(corner);
     const verticalOffset = this.getVerticalOriginOffset_(corner);
     const position = {
-      [horizontalAlignment]: horizontalOffset ? horizontalOffset + 'px' : '0',
-      [verticalAlignment]: verticalOffset ? verticalOffset + 'px' : '0',
+      [horizontalAlignment]: horizontalOffset ? horizontalOffset : '0',
+      [verticalAlignment]: verticalOffset ? verticalOffset : '0',
     };
     const {anchorWidth, surfaceHeight, surfaceWidth} = this.measures_;
     // Center align when anchor width is comparable or greater than menu surface, otherwise keep corner.
@@ -382,6 +392,18 @@ class MDCMenuSurfaceFoundation extends MDCFoundation {
       const originPercent = (corner & MenuSurfaceCornerBit.BOTTOM)
         ? 100 - verticalOffsetPercent : verticalOffsetPercent;
       verticalAlignment = Math.round(originPercent * 100) / 100 + '%';
+    }
+
+    if (this.hoistedElement_) {
+      for (const prop in position) {
+        if (this.measures_.viewportDistance.hasOwnProperty(prop)) {
+          if (prop === 'top' || prop === 'left') {
+            position[prop] = parseInt(position[prop]) + this.measures_.viewportDistance[prop] + 'px';
+          } else {
+            position[prop] = this.measures_.viewportDistance[prop] + parseInt(position[prop]) + 'px';
+          }
+        }
+      }
     }
 
     this.adapter_.setTransformOrigin(`${horizontalAlignment} ${verticalAlignment}`);
